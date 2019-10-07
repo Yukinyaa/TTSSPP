@@ -3,7 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.572
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TSP", "TSP\TSP.csproj", "{F1056234-AE9F-4618-A65A-CC4591D02ADB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TSP", "TSP\TSP.csproj", "{F9191829-BCFD-4638-88C6-40E19A7E1A34}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TspGUI", "TspGUI\TspGUI.csproj", "{3B44D58F-710F-4BF9-A825-3D5C0B5D4A73}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F9191829-BCFD-4638-88C6-40E19A7E1A34} = {F9191829-BCFD-4638-88C6-40E19A7E1A34}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +16,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F1056234-AE9F-4618-A65A-CC4591D02ADB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F1056234-AE9F-4618-A65A-CC4591D02ADB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F1056234-AE9F-4618-A65A-CC4591D02ADB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F1056234-AE9F-4618-A65A-CC4591D02ADB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9191829-BCFD-4638-88C6-40E19A7E1A34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9191829-BCFD-4638-88C6-40E19A7E1A34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9191829-BCFD-4638-88C6-40E19A7E1A34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9191829-BCFD-4638-88C6-40E19A7E1A34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B44D58F-710F-4BF9-A825-3D5C0B5D4A73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B44D58F-710F-4BF9-A825-3D5C0B5D4A73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B44D58F-710F-4BF9-A825-3D5C0B5D4A73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B44D58F-710F-4BF9-A825-3D5C0B5D4A73}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

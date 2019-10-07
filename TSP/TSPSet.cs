@@ -4,7 +4,7 @@ using System.IO;
 
 namespace TSP
 {
-    class TSPSet
+    public class TSPSet
     {
         private List<Node> dataSet;
         private float?[,] distCache;
@@ -30,7 +30,7 @@ namespace TSP
                 string s;
                 while ((s = sr.ReadLine()) != null)
                 {
-                    var split = s.Split(" : ");
+                    var split = s.Split(new string[]{" : "}, StringSplitOptions.None);
                     switch (split[0].ToLower())
                     {
                         case "name":
@@ -76,7 +76,7 @@ namespace TSP
                 return (float)distCache[a, b];// is never null here
 
             float xd = dataSet[a].X - dataSet[b].X, yd = dataSet[a].Y - dataSet[b].Y;
-            distCache[a, b] = MathF.Sqrt(xd * xd + yd * yd);
+            distCache[a, b] = (float)Math.Sqrt(xd * xd + yd * yd);
             return (float)distCache[a, b];
         }
     }

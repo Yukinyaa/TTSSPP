@@ -1,6 +1,6 @@
 ﻿namespace TSP
 {
-    struct Node
+    public struct Node
     {
         public Node(int no, int x, int y)
         {

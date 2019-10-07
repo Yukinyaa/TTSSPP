@@ -5,16 +5,16 @@ using System.IO;
 
 namespace TSP
 {
-    partial class TSP
+    public partial class TSP
     {
         static void Main(string[] args)
         {
             var read = new TSPSet();
-            var greedtRestult = new TSP.Greedy().Algo(read);
+            var greedtRestult = new Greedy().Algo(read);
             Evaluate(greedtRestult, read);
         }
 
-        private static void Evaluate(List<Node> result, TSPSet input)
+        public static int Evaluate(List<Node> result, TSPSet input)
         {
             List<Node> pool = input.CopySet();
             Node prev = result[0];
@@ -40,6 +40,7 @@ namespace TSP
             {
                 Console.Write(node.No + " ");
             }
+            return pool.Count;
         }
     }
 }
