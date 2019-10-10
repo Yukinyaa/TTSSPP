@@ -66,6 +66,11 @@ namespace TSP
         }
 
 
+        public float EucDist(Node a, int x, int y)
+        {
+            float xd = a.X - x, yd = a.Y - y;
+            return (float)Math.Sqrt(xd * xd + yd * yd);
+        }
         public float EucDist(Node a, Node b)
         {
             return EucDist(a.No - 1, b.No - 1);

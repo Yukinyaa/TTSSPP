@@ -4,12 +4,12 @@ using System.Linq;
 
 namespace TSP
 {
-    public class Greedy
+    public class Greedy_v2
     {
         List<Node> result;
         List<Node> pool;
 
-        public Greedy()
+        public Greedy_v2()
         {
         }
 
@@ -95,27 +95,48 @@ namespace TSP
             }
         }
 
+        enum Direction { up, down }
         public List<Node> Algo(TSPSet nodes)
         {
-            
+
             result = new List<Node>();
             pool = nodes.CopySet();
-            
-            Select(pool.Aggregate((x, y) => nodes.EucDist(x, 0, 0) < nodes.EucDist(y, 0, 0) ? x : y));
 
+            Direction direction = Direction.down;
+            Select(pool.Aggregate((x, y) => nodes.EucDist(x, 0, 0) < nodes.EucDist(y, 0, 0) ? x : y));
+            
             while (pool.Count != 0)
             {
-                List<Node> dists = new List<Node>(pool);
                 Node current = result[result.Count - 1];
+                List<Node> dists;
+                int range = 50;
 
-                dists.Sort(new EucComparer(nodes, current));
-                var best5 = dists.ToList().GetRange(0,Math.Min(dists.Count,5));
+                do {
+                    dists = pool.Where(node => Math.Abs(node.X - current.X) <= range && Math.Abs(node.Y - current.Y) <= range).ToList();
+                    range *= 2;
+                }
+                while (dists.Count == 0);
 
-                best5.Sort(new AxisPriorityComparer(nodes, current, AxisPriorityComparer.Priority.XSmall));
-                var minval = best5[0];
-                Select(minval);
-            }
+                var minX = dists.Min(a => a.X);
+
+                if (direction == Direction.up)
+                    if (!dists.Exists(a => a.Y > current.Y))
+                        direction = Direction.down;
+                else //if direction == Direction.down
+                    if (!dists.Exists(a => a.Y < current.Y))
+                        direction = Direction.up;
+
+                var next = dists.Where(a => a.X == minX).Aggregate((a, b) =>
+                                                                        (
+                                                                        ( (direction == Direction.up ? (a.Y > b.Y) : (a.Y < b.Y)) )
+                                                                        ^
+                                                                        (minX - current.X >= 0)
+                                                                        ) ? a : b
+                                                                );
                 
+                Select(next);
+            }
+
             return result;
         }
     }

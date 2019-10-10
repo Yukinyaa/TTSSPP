@@ -10,14 +10,29 @@ namespace TSP
         static void Main(string[] args)
         {
             var read = new TSPSet();
-            var greedtRestult = new Greedy().Algo(read);
-            Evaluate(greedtRestult, read);
+            var result = new SimpleGreedy().Algo(read, 0xabcd);
+
+            Evaluate(result, read);
+            var hc = new HillClimbing(result, read);
+            try
+            {
+
+                for (int i = 0; i < 1000; i++)
+                {
+                    result = hc.Iteration();
+                    Console.WriteLine(hc.IterMsg);
+                }
+            }
+            catch (InvalidOperationException) { Console.WriteLine("Too much taboo - \n"+hc.IterMsg); }
+            Evaluate(result, read);
         }
 
-        public static int Evaluate(List<Node> result, TSPSet input)
+        public static int Evaluate(List<Node> result_, TSPSet input)
         {
             List<Node> pool = input.CopySet();
+            var result = new List<Node>(result_);
             Node prev = result[0];
+            
             result.Remove(prev);
             pool.Remove(prev);
             float score = 0;
@@ -26,7 +41,7 @@ namespace TSP
                 pool.Remove(node);
                 score += input.EucDist(prev, node);
 
-                Console.WriteLine("score : " + score + "\tnode : " + node.No);
+                //Console.WriteLine("score : " + score + "\tnode : " + node.No);
                 prev = node;
             }
             Console.WriteLine();
@@ -40,6 +55,10 @@ namespace TSP
             {
                 Console.Write(node.No + " ");
             }
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine("score : " + score);
+            Console.WriteLine("validation : " + pool.Count);
             return pool.Count;
         }
     }

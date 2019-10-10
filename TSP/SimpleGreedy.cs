@@ -4,12 +4,12 @@ using System.Linq;
 
 namespace TSP
 {
-    public class Greedy
+    public class SimpleGreedy
     {
         List<Node> result;
         List<Node> pool;
 
-        public Greedy()
+        public SimpleGreedy()
         {
         }
 
@@ -95,13 +95,16 @@ namespace TSP
             }
         }
 
-        public List<Node> Algo(TSPSet nodes)
+        public List<Node> Algo(TSPSet nodes, int? startpoint = null)
         {
-            
+
             result = new List<Node>();
             pool = nodes.CopySet();
-            
-            Select(pool.Aggregate((x, y) => nodes.EucDist(x, 0, 0) < nodes.EucDist(y, 0, 0) ? x : y));
+
+            if (startpoint == null)
+                Select(pool.Aggregate((x, y) => nodes.EucDist(x, 0, 0) < nodes.EucDist(y, 0, 0) ? x : y));
+            else
+                Select(pool[(startpoint ?? 0) % pool.Count]);
 
             while (pool.Count != 0)
             {
@@ -109,13 +112,10 @@ namespace TSP
                 Node current = result[result.Count - 1];
 
                 dists.Sort(new EucComparer(nodes, current));
-                var best5 = dists.ToList().GetRange(0,Math.Min(dists.Count,5));
-
-                best5.Sort(new AxisPriorityComparer(nodes, current, AxisPriorityComparer.Priority.XSmall));
-                var minval = best5[0];
+                var minval = dists[0];
                 Select(minval);
             }
-                
+
             return result;
         }
     }
