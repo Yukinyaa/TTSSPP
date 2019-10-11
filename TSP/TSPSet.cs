@@ -8,6 +8,7 @@ namespace TSP
     {
         private List<Node> dataSet;
         private float?[,] distCache;
+        internal int size;
 
         private Node this[int i]
         {
@@ -62,6 +63,7 @@ namespace TSP
                     MaxY = Math.Max(MaxY, newNode.Y);
                 }
             }
+            size = dimension ?? -1;
             distCache = new float?[dimension ?? -1, dimension ?? -1];
         }
 

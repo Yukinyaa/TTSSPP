@@ -6,10 +6,10 @@ namespace TSP
 {
     public class Random
     {
-        public List<Node> Algo(TSPSet nodes)
+        public List<Node> Algo(TSPSet nodes, int seed)
         {
             var pool = nodes.CopySet();
-            System.Random rnd = new System.Random();
+            System.Random rnd = new System.Random(seed);
             for (int i = 0; i < pool.Count; i++)
             {
                 var rand = rnd.Next() % pool.Count;

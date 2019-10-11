@@ -19,7 +19,7 @@ namespace TspGUI
         public Form1()
         {
             InitializeComponent();
-            result = new TSP.Random().Algo(read);
+            result = new TSP.Greedy_v4_Simple().Algo(read);
             hc = new HillClimbing(result, read);
         }
 
@@ -49,7 +49,11 @@ namespace TspGUI
                 count++;
                 float percnetage = (float)count/read.CopySet().Count;
                 Node a = prev, b = node;
-                g.DrawLine(new Pen(Color.FromArgb(100, 0, (int)(255 - 255 * percnetage%4*4), 0)), new Point(a.X * pw / gw + bd, a.Y * ph / gh + bd), new Point(b.X * pw / gw + bd, b.Y * ph / gh + bd));
+                float red = Math.Max(0, percnetage * 2 - 1);
+                float green = Math.Min(percnetage * 2, 2 - percnetage * 2);
+                float blue = Math.Max(0, 1 - percnetage * 2);
+                g.DrawLine(new Pen(Color.FromArgb(150, (int)(255 * red), (int)(255 * green),(int)(255 * blue))),
+                                         new Point(a.X * pw / gw + bd, a.Y * ph / gh + bd), new Point(b.X * pw / gw + bd, b.Y * ph / gh + bd));
 
                 score += read.EucDist(prev, node);
                 prev = node;

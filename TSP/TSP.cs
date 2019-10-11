@@ -10,17 +10,15 @@ namespace TSP
         static void Main(string[] args)
         {
             var read = new TSPSet();
-            var result = new SimpleGreedy().Algo(read, 0xabcd);
+            var result = new Greedy_v4_Simple().Algo(read);
 
             Evaluate(result, read);
             var hc = new HillClimbing(result, read);
             try
             {
-
                 for (int i = 0; i < 1000; i++)
                 {
                     result = hc.Iteration();
-                    Console.WriteLine(hc.IterMsg);
                 }
             }
             catch (InvalidOperationException) { Console.WriteLine("Too much taboo - \n"+hc.IterMsg); }
@@ -38,7 +36,7 @@ namespace TSP
             float score = 0;
             foreach (var node in result)
             {
-                pool.Remove(node);
+                pool.Remove(node);  
                 score += input.EucDist(prev, node);
 
                 //Console.WriteLine("score : " + score + "\tnode : " + node.No);
