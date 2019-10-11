@@ -103,13 +103,13 @@ namespace TSP
         }
 
         enum Direction { up, down }
-        public List<Node> Algo(TSPSet nodes, int seed = 0)
+        public List<Node> Algo(TSPSet nodes, int? seed = null)
         {
 
             result = new List<Node>();
             pool = nodes.CopySet();
             
-            if (seed == 0)
+            if (seed == null)
             {
                 Select(pool.Aggregate((x, y) => nodes.EucDist(x, 0, 0) < nodes.EucDist(y, 0, 0) ? x : y));
                 Node current = result[result.Count - 1];
@@ -118,7 +118,7 @@ namespace TSP
             else
             {
                 Node se;
-                Select(se = pool[seed % pool.Count]);
+                Select(se = pool[(seed??-1) % pool.Count]);
                 Node current = result[result.Count - 1];
                 Select(pool.Aggregate((x, y) => nodes.EucDist(x, current) < nodes.EucDist(y, current) ? x : y));
 

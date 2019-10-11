@@ -31,7 +31,7 @@ namespace TSP
                 string s;
                 while ((s = sr.ReadLine()) != null)
                 {
-                    var split = s.Split(new string[]{" : "}, StringSplitOptions.None);
+                    var split = s.Split(new string[] { " : " }, StringSplitOptions.None);
                     switch (split[0].ToLower())
                     {
                         case "name":
@@ -79,6 +79,12 @@ namespace TSP
         }
         public float EucDist(int a, int b)
         {
+            if (a < b)
+            {
+                var tmp = a;
+                a = b;
+                b = tmp;
+            }
             if (distCache[a, b] != null)
                 return (float)distCache[a, b];// is never null here
 
