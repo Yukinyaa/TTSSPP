@@ -42,7 +42,7 @@ namespace TSP
 
         static object seedLock = new object();
         static System.Random rng = new System.Random();
-        static List<int?> gunbonseeds = new List<int?> { null, 1961, 409, 741, 2095, 9, 438, 0x1234, 77, 0xabcd, 1852992319, 1897423924, 526, 879, 468, 557, 1326, 2061, 38, 37, 40, 173, 177, 187, 279, 408 };
+        static List<int?> gunbonseeds = new List<int?> { null, 1961, 409, 741, 879, 2095, 9, 438, 0x1234, 77, 0xabcd, 1852992319, 1897423924, 526, 468, 557, 1326, 2061, 38, 37, 40, 173, 177, 187, 279, 408, };
 
 
         static void GreedyRun()
