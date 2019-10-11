@@ -19,7 +19,7 @@ namespace TspGUI
         public Form1()
         {
             InitializeComponent();
-            result = new TSP.Greedy_v4_Simple().Algo(read);
+            result = new TSP.Greedy_v4_Simple().Algo(read,879);
             hc = new HillClimbing(result, read);
         }
 

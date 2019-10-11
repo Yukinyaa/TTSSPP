@@ -19,7 +19,7 @@ namespace TSP
 
             for(int i=0;i<tcount;i++)threads.Add(new Thread(GreedyRun));
             foreach (var t in threads) t.Start();
-            Thread.Sleep(int.MaxValue);
+            Thread.Sleep(50000);
             lock(bestLock)lock(seedLock)
                 foreach (var t in threads) t.Abort();
             File.WriteAllText("./GreedyResult.txt", greedyBest.@out);
@@ -42,8 +42,7 @@ namespace TSP
 
         static object seedLock = new object();
         static System.Random rng = new System.Random();
-        static List<int> gunbonseeds = Enumerable.Range(0, 3000).ToList();
-            //new List<int?> { null, 0x1234, 77, 0xabcd, 1852992319, 1897423924, 526};
+        static List<int?> gunbonseeds = new List<int?> { null, 1961, 409, 741, 2095, 9, 438, 0x1234, 77, 0xabcd, 1852992319, 1897423924, 526, 879, 468, 557, 1326, 2061, 38, 37, 40, 173, 177, 187, 279, 408 };
 
 
         static void GreedyRun()
@@ -69,7 +68,7 @@ namespace TSP
                     gunbonseeds.RemoveAt(0);
                 }
             }
-            Console.WriteLine("greedy start with seed : " + seed);
+            if(seed%10==0)Console.WriteLine("greedy start with seed : " + seed);
             var result = new Greedy_v4_Simple().Algo(read, seed);
 
             var greedyEval = Evaluate(result, read);
@@ -87,16 +86,20 @@ namespace TSP
 
         }
 
-        int greedyCount = 0;
+        static int hcCnt = 0;
         static void HillClimbingIteration()
         {
             List<Node> result;
+            int hcno;
             lock (seedLock)
             {
+                if (greedyResiults.Count == 0) return;
                 result = greedyResiults[0];
                 greedyResiults.RemoveAt(0);
+                hcno = hcCnt++;
             }
-            Console.WriteLine("hc start : " + result.GetHashCode());
+            
+            Console.WriteLine("hc start : " + hcno);
 
             var hc = new HillClimbing(result, read);
             try
@@ -113,7 +116,10 @@ namespace TSP
             lock (bestLock)
             {
                 if (hcBest.score > greedyEval.score)
+                {
                     hcBest = greedyEval;
+                    Console.WriteLine("hc new best : " + hcno + ", " + hcBest.score);
+                }
             }
         }
         public struct EvalF

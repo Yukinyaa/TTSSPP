@@ -21,7 +21,7 @@ namespace TSP
         public int MaxX { get; private set; }
         public int MaxY { get; private set; }
 
-        public TSPSet(string path = "./rbx711.tsp.txt")
+        public TSPSet(string path = "./input.txt")
         {
             string name;
             int? dimension = null;
