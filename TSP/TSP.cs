@@ -5,6 +5,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Linq;
+using System.Diagnostics;
 
 namespace TSP
 {
@@ -14,14 +15,18 @@ namespace TSP
 
         static void Main(string[] args)
         {
-            int tcount = 12;
+            testGA();
+        }
+        static void run()
+        {
+            int tcount = 4;
             List<Thread> threads = new List<Thread>();
 
-            for(int i=0;i<tcount;i++)threads.Add(new Thread(GreedyRun));
+            for (int i = 0; i < tcount; i++) threads.Add(new Thread(GreedyRun));
             foreach (var t in threads) t.Start();
-            Thread.Sleep(50000);
-            lock(bestLock)lock(seedLock)
-                foreach (var t in threads) t.Abort();
+            Thread.Sleep(10000);
+            lock (bestLock) lock (seedLock)
+                    foreach (var t in threads) t.Abort();
             File.WriteAllText("./GreedyResult.txt", greedyBest.@out);
 
             threads = new List<Thread>();
@@ -31,12 +36,44 @@ namespace TSP
             lock (bestLock) lock (seedLock)
                     foreach (var t in threads) t.Abort();
             File.WriteAllText("./HCResult.txt", hcBest.@out);
+        }
+        static void testGA()
+        {
+            for (int i = 0; i < 12; i++)
+            {
+                GreedyIteration();
+            } 
+            var ga = new GA_HJ(greedyResiults.Values, read);
+            for (int i = 0; i < 100; i++) ga.Iteration();
+
+        }
+        static void test()
+        {
+
+
+            Stopwatch sw = new Stopwatch();
+
+            sw.Reset();sw.Start();
+            var result = new Greedy_v4_Simple().Algo(read);
+            var hc = new SA_v1(result, read);
+            try
+            {
+                for (int i = 0; i < 10000; i++)
+                {
+                    result = hc.Iteration();
+                    Console.WriteLine(hc.IterMsg);
+                }
+            }
+            catch (InvalidOperationException) { /*Console.WriteLine("Too much taboo - \n" + hc.IterMsg);*/ }
+            sw.Stop();
+            Console.WriteLine(Evaluate(result, read).@out);
+            Console.WriteLine("Elapsed={0}", sw.Elapsed);
 
         }
 
 
         static object bestLock = new object();
-        static List<List<Node>> greedyResiults = new List<List<Node>>();
+        static SortedList<float,List<Node>> greedyResiults = new SortedList<float,List<Node>>();
         static EvalF greedyBest = new EvalF() { score = float.MaxValue };
         static EvalF hcBest = new EvalF() { score = float.MaxValue };
 
@@ -81,7 +118,7 @@ namespace TSP
                     greedyBest = greedyEval;
                     Console.WriteLine("greedy new best(" + seed + ":" + greedyEval.score + ")");
                 }
-                greedyResiults.Add(result);
+                greedyResiults.Add(greedyEval.score,result);
             }
 
         }
@@ -94,7 +131,7 @@ namespace TSP
             lock (seedLock)
             {
                 if (greedyResiults.Count == 0) return;
-                result = greedyResiults[0];
+                result = greedyResiults.ElementAt(0).Value;
                 greedyResiults.RemoveAt(0);
                 hcno = hcCnt++;
             }

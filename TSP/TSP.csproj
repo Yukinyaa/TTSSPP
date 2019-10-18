@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GA_HJ.cs" />
     <Compile Include="Greedy.cs" />
     <Compile Include="Greedy_v3.cs" />
     <Compile Include="Greedy_v4.cs" />
@@ -53,6 +54,8 @@
     <Compile Include="Node.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Random.cs" />
+    <Compile Include="AdjRep.cs" />
+    <Compile Include="SA_v1.cs" />
     <Compile Include="SimpleGreedy.cs" />
     <Compile Include="TSP.cs" />
     <Compile Include="TSPSet.cs" />
