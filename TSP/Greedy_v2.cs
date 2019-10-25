@@ -11,6 +11,7 @@ namespace TSP
 
         public Greedy_v2()
         {
+
         }
 
         void Select(Node a)
@@ -35,66 +36,7 @@ namespace TSP
                 else return -1;
             }
         }
-
-        class AxisPriorityComparer : IComparer<Node>
-        {
-            public AxisPriorityComparer(TSPSet nodes, Node current, Priority priority)
-            {
-                this.nodes = nodes;
-                this.current = current;
-                this.priority = priority;
-            }
-            TSPSet nodes;
-            Node current;
-            Priority priority;
-            public enum Priority
-            {
-                XSmall,// Default Priority
-                XBig, // Reversed Priority
-                YSmall,
-                YBig
-            }
-            public int Compare(Node a, Node b)
-            {
-                float axd = Math.Abs(a.X - current.X), bxd = Math.Abs(b.X - current.X);
-                float ayd = Math.Abs(a.Y - current.Y), byd = Math.Abs(b.Y - current.Y);
-                switch (priority)
-                {
-                    case Priority.XSmall:
-                        if (axd == bxd)
-                        {
-                            if (ayd == byd) return 0;
-                            else return ayd > byd ? 1 : -1;
-                        }
-                        else return axd > bxd ? 1 : -1;
-
-                    case Priority.XBig:
-                        if (axd == bxd)
-                        {
-                            if (ayd == byd) return 0;
-                            else return ayd > byd ? 1 : -1;
-                        }
-                        else return axd < bxd ? 1 : -1;
-
-                    case Priority.YSmall:
-                        if (ayd == byd)
-                        {
-                            if (axd == bxd) return 0;
-                            else return axd > bxd ? 1 : -1;
-                        }
-                        else return ayd > byd ? 1 : -1;
-                    case Priority.YBig:
-                        if (ayd == byd)
-                        {
-                            if (axd == bxd) return 0;
-                            else return axd > bxd ? 1 : -1;
-                        }
-                        else return ayd < byd ? 1 : -1;
-                }
-                return 0;
-            }
-        }
-
+        
         enum Direction { up, down }
         public List<Node> Algo(TSPSet nodes)
         {

@@ -126,10 +126,12 @@ namespace TSP
             }
             //else
             {
-                
+                float lpsFactor = 0.05f;
+                if ((rmCost - calculatedCost) * lpsFactor + prevImp * (1 - lpsFactor) < 3)
+                    throw new InvalidOperationException();
+
                 map.Insert(pos, sel);
 
-                float lpsFactor = 0.05f;
                 if(!badMove) prevImp = (rmCost - calculatedCost) * lpsFactor + prevImp * (1 - lpsFactor);
                 IterMsg.AppendLine("Improved by: " + (rmCost - calculatedCost) + "(" + Temperture + ", " + tabooTimeout + ")");
                 if(badMove)IterMsg.Append("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");

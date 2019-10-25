@@ -15,47 +15,75 @@ namespace TSP
 
         static void Main(string[] args)
         {
-            testGA();
+            run();
         }
         static void run()
         {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             int tcount = 4;
             List<Thread> threads = new List<Thread>();
 
+
             for (int i = 0; i < tcount; i++) threads.Add(new Thread(GreedyRun));
             foreach (var t in threads) t.Start();
-            Thread.Sleep(10000);
+            Thread.Sleep(50000);
             lock (bestLock) lock (seedLock)
                     foreach (var t in threads) t.Abort();
             File.WriteAllText("./GreedyResult.txt", greedyBest.@out);
+            Console.WriteLine("Greedy finished at: {0}", stopwatch.Elapsed);
 
-            threads = new List<Thread>();
+            threads.Clear();
             for (int i = 0; i < tcount; i++) threads.Add(new Thread(HCRun));
             foreach (var t in threads) t.Start();
             Thread.Sleep(50000);
             lock (bestLock) lock (seedLock)
                     foreach (var t in threads) t.Abort();
             File.WriteAllText("./HCResult.txt", hcBest.@out);
+            Console.WriteLine("HC finished at: {0}", stopwatch.Elapsed);
+
+            threads.Clear();
+            for (int i = 0; i < tcount; i++) threads.Add(new Thread(SARun));
+            foreach (var t in threads) t.Start();
+            Thread.Sleep(50000);
+            lock (bestLock) lock (seedLock)
+                    foreach (var t in threads) t.Abort();
+            File.WriteAllText("./SAResult.txt", saBest.@out);
+            Console.WriteLine("SA finished at: {0}", stopwatch.Elapsed);
+
+            threads.Clear();
+
+
+            threads.Add(new Thread(GARun));
+            foreach (var t in threads) t.Start();
+            Thread.Sleep(50000);
+
+            lock (bestLock) lock (seedLock) lock (gaRun.killLock)
+                        foreach (var t in threads) t.Abort();
+            File.WriteAllText("./GAResult.txt", Evaluate(gaRun.Best,read).@out);
+            Console.WriteLine("GA finished at: {0}", stopwatch.Elapsed);
+
         }
         static void testGA()
         {
             Stopwatch sw = new Stopwatch();
 
             sw.Reset(); sw.Start();
-            int tcount = 3;
+            int tcount = 4;
             List<Thread> threads = new List<Thread>();
 
             for (int i = 0; i < tcount; i++) threads.Add(new Thread(GreedyIteration));
             foreach (var t in threads) t.Start();
             foreach (var t in threads)
             { while (t.IsAlive) Thread.Sleep(10); }
+            threads.Clear();
 
-            var ga = new GA_HJ(greedyResiults.Values, read);
+            var ga = new TSP_YJ(greedyResultsForSA.Values, read);
             for (int i = 0; i < 100; i++) ga.Iteration();
             sw.Stop();
             Console.WriteLine(Evaluate(ga.Best, read).@out);
             Console.WriteLine("Elapsed={0}", sw.Elapsed);
-
         }
         static void test()
         {
@@ -63,15 +91,17 @@ namespace TSP
 
             Stopwatch sw = new Stopwatch();
 
-            sw.Reset();sw.Start();
-            var result = new Greedy_v4_Simple().Algo(read);
-            var hc = new SA_v1(result, read);
+            sw.Reset(); sw.Start();
+            var result = new SimpleGreedy().Algo(read);
+            Console.WriteLine(Evaluate(result, read).@out);
+            var hc = new HillClimbing(result, read);
             try
             {
                 for (int i = 0; i < 10000; i++)
                 {
                     result = hc.Iteration();
-                    Console.WriteLine(hc.IterMsg);
+                    //Console.WriteLine(hc.IterMsg);
+                    if (i % 100 == 0) Console.WriteLine(">>>>>>>>>>>>>>>ev: {0}", Evaluate(result, read).score);
                 }
             }
             catch (InvalidOperationException) { /*Console.WriteLine("Too much taboo - \n" + hc.IterMsg);*/ }
@@ -83,13 +113,16 @@ namespace TSP
 
 
         static object bestLock = new object();
-        static SortedList<float,List<Node>> greedyResiults = new SortedList<float,List<Node>>();
+        static SortedList<float, List<Node>> greedyResultsForHC = new SortedList<float, List<Node>>();
+        static SortedList<float, List<Node>> greedyResultsForSA = new SortedList<float, List<Node>>();
+        static List<List<Node>> allResiults = new List<List<Node>>();
         static EvalF greedyBest = new EvalF() { score = float.MaxValue };
         static EvalF hcBest = new EvalF() { score = float.MaxValue };
+        static EvalF saBest = new EvalF() { score = float.MaxValue };
 
         static object seedLock = new object();
         static System.Random rng = new System.Random();
-        static List<int?> gunbonseeds = new List<int?> { null, 1961, 409, 741, 879, 2095, 9, 438, 0x1234, 77, 0xabcd, 1852992319, 1897423924, 526, 468, 557, 1326, 2061, 38, 37, 40, 173, 177, 187, 279, 408, };
+        static List<int?> gunbonseeds = new List<int?> { null, };//1961, 409, 741, 879, 2095, 9, 438, 0x1234, 77, 0xabcd, 1852992319, 1897423924, 526, 468, 557, 1326, 2061, 38, 37, 40, 173, 177, 187, 279, 408, 
 
 
         static void GreedyRun()
@@ -116,7 +149,7 @@ namespace TSP
                 }
             }
             if (seed % 10 == 0) Console.WriteLine("greedy start with seed : " + seed);
-            var result = new Greedy_v4_Simple().Algo(read, seed);
+            var result = new SimpleGreedy().Algo(read, seed);
 
             var greedyEval = Evaluate(result, read);
             greedyEval.seed = seed;
@@ -128,12 +161,14 @@ namespace TSP
                     greedyBest = greedyEval;
                     Console.WriteLine("greedy new best(" + seed + ":" + greedyEval.score + ")");
                 }
-                greedyResiults.Add(greedyEval.score,result);
+                allResiults.Add(result);
+                greedyResultsForHC.Add(greedyEval.score, result);
+                greedyResultsForSA.Add(greedyEval.score, result);
             }
 
         }
 
-        static void GreedyLikeRandom555Iteration()
+        static void GreedyLikeRandomIteration()
         {
             int? seed;
             lock (seedLock)
@@ -147,7 +182,7 @@ namespace TSP
                 }
             }
             if (seed % 10 == 0) Console.WriteLine("greedy start with seed : " + seed);
-            var result = new Random().Algo(read, seed??0);
+            var result = new Random().Algo(read, seed ?? 0);
 
             var greedyEval = Evaluate(result, read);
             greedyEval.seed = seed;
@@ -159,46 +194,104 @@ namespace TSP
                     greedyBest = greedyEval;
                     Console.WriteLine("greedy new best(" + seed + ":" + greedyEval.score + ")");
                 }
-                greedyResiults.Add(greedyEval.score, result);
+                greedyResultsForSA.Add(greedyEval.score, result);
             }
 
         }
+
         static int hcCnt = 0;
         static void HillClimbingIteration()
         {
             List<Node> result;
             int hcno;
+
+            if (greedyResultsForHC.Count == 0) GreedyIteration();
             lock (seedLock)
             {
-                if (greedyResiults.Count == 0) return;
-                result = greedyResiults.ElementAt(0).Value;
-                greedyResiults.RemoveAt(0);
+                result = greedyResultsForHC.ElementAt(0).Value;
+                greedyResultsForHC.RemoveAt(0);
                 hcno = hcCnt++;
             }
-            
+
             Console.WriteLine("hc start : " + hcno);
 
             var hc = new HillClimbing(result, read);
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             try
             {
-                for (int i = 0; i < 1000; i++)
+                for (int i = 0; i < 1000 && sw.ElapsedTicks < 30000; i++)
                 {
                     result = hc.Iteration();
                 }
             }
             catch (InvalidOperationException) { /*Console.WriteLine("Too much taboo - \n" + hc.IterMsg);*/ }
 
-            var greedyEval = Evaluate(result, read);
+            var eval = Evaluate(result, read);
 
             lock (bestLock)
             {
-                if (hcBest.score > greedyEval.score)
+                if (hcBest.score > eval.score)
                 {
-                    hcBest = greedyEval;
+                    hcBest = eval;
                     Console.WriteLine("hc new best : " + hcno + ", " + hcBest.score);
+
+                    allResiults.Add(result);
                 }
             }
         }
+
+        static int saCount = 0;
+        static void SARun() { for (; ; ) SAIteration(); }
+        static void SAIteration()
+        {
+            List<Node> result;
+            int hcno;
+
+            if (greedyResultsForSA.Count == 0) GreedyIteration();
+            lock (seedLock)
+            {
+                if (greedyResultsForSA.Count == 0) return;
+                result = greedyResultsForSA.ElementAt(0).Value;
+                greedyResultsForSA.RemoveAt(0);
+                hcno = saCount++;
+            }
+
+            Console.WriteLine("hc start : " + hcno);
+
+            var hc = new HillClimbing(result, read);
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            try
+            {
+                for (int i = 0; i < 1000 && sw.ElapsedTicks < 30000; i++)
+                {
+                    result = hc.Iteration();
+                }
+            }
+            catch (InvalidOperationException) { /*Console.WriteLine("Too much taboo - \n" + hc.IterMsg);*/ }
+
+            var eval = Evaluate(result, read);
+
+            lock (bestLock)
+            {
+                if (saBest.score > eval.score)
+                {
+                    saBest = eval;
+                    Console.WriteLine("hc new best : " + hcno + ", " + hcBest.score);
+
+                    allResiults.Add(result);
+                }
+            }
+        }
+
+        static TSP_YJ gaRun;
+        static void GARun()
+        {
+            gaRun = new TSP_YJ(allResiults, read);
+            for (; ; ) gaRun.Iteration();
+        }
+
         public struct EvalF
         {
             public int? seed;

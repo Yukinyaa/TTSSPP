@@ -59,6 +59,7 @@
     <Compile Include="SimpleGreedy.cs" />
     <Compile Include="TSP.cs" />
     <Compile Include="TSPSet.cs" />
+    <Compile Include="TSP_YJ.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

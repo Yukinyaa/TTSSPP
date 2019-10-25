@@ -40,7 +40,7 @@ namespace TSP
                 int twoptFrom = b.reversePath[i], twooptTo = b.path[i];
                 swp--;
 
-                if (bratio < rng.Next())
+                if (bratio < rng.NextDouble())
                 {
                     if (b.path[i] == -1)
                         twoptFrom = path.IndexOf(b.path[i]);
