@@ -39,12 +39,22 @@ namespace TSP
         }
         static void testGA()
         {
-            for (int i = 0; i < 12; i++)
-            {
-                GreedyIteration();
-            } 
+            Stopwatch sw = new Stopwatch();
+
+            sw.Reset(); sw.Start();
+            int tcount = 3;
+            List<Thread> threads = new List<Thread>();
+
+            for (int i = 0; i < tcount; i++) threads.Add(new Thread(GreedyIteration));
+            foreach (var t in threads) t.Start();
+            foreach (var t in threads)
+            { while (t.IsAlive) Thread.Sleep(10); }
+
             var ga = new GA_HJ(greedyResiults.Values, read);
             for (int i = 0; i < 100; i++) ga.Iteration();
+            sw.Stop();
+            Console.WriteLine(Evaluate(ga.Best, read).@out);
+            Console.WriteLine("Elapsed={0}", sw.Elapsed);
 
         }
         static void test()
@@ -105,7 +115,7 @@ namespace TSP
                     gunbonseeds.RemoveAt(0);
                 }
             }
-            if(seed%10==0)Console.WriteLine("greedy start with seed : " + seed);
+            if (seed % 10 == 0) Console.WriteLine("greedy start with seed : " + seed);
             var result = new Greedy_v4_Simple().Algo(read, seed);
 
             var greedyEval = Evaluate(result, read);
@@ -123,6 +133,36 @@ namespace TSP
 
         }
 
+        static void GreedyLikeRandom555Iteration()
+        {
+            int? seed;
+            lock (seedLock)
+            {
+                if (gunbonseeds.Count == 0)
+                    seed = rng.Next();
+                else
+                {
+                    seed = gunbonseeds[0];
+                    gunbonseeds.RemoveAt(0);
+                }
+            }
+            if (seed % 10 == 0) Console.WriteLine("greedy start with seed : " + seed);
+            var result = new Random().Algo(read, seed??0);
+
+            var greedyEval = Evaluate(result, read);
+            greedyEval.seed = seed;
+
+            lock (bestLock)
+            {
+                if (greedyBest.score > greedyEval.score)
+                {
+                    greedyBest = greedyEval;
+                    Console.WriteLine("greedy new best(" + seed + ":" + greedyEval.score + ")");
+                }
+                greedyResiults.Add(greedyEval.score, result);
+            }
+
+        }
         static int hcCnt = 0;
         static void HillClimbingIteration()
         {
