@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TSP
 {
-    class TSP_YJ
+    class GA_YJ
     {
         List<Node> result;
         SortedDictionary<float, List<Node>> thisGeneration;
@@ -33,81 +33,17 @@ namespace TSP
             }
         }
         
-
-        class AxisPriorityComparer : IComparer<Node>
-        {
-            public AxisPriorityComparer(TSPSet nodes, Node current, Priority priority)
-            {
-                this.nodes = nodes;
-                this.current = current;
-                this.priority = priority;
-            }
-            TSPSet nodes;
-            Node current;
-            Priority priority;
-            public enum Priority
-            {
-                XSmall,// Default Priority
-                XBig, // Reversed Priority
-                YSmall,
-                YBig
-            }
-            public int Compare(Node a, Node b)
-            {
-                float axd = Math.Abs(a.X - current.X), bxd = Math.Abs(b.X - current.X);
-                float ayd = Math.Abs(a.Y - current.Y), byd = Math.Abs(b.Y - current.Y);
-                switch (priority)
-                {
-                    case Priority.XSmall:
-                        if (axd == bxd)
-                        {
-                            if (ayd == byd) return 0;
-                            else return ayd > byd ? 1 : -1;
-                        }
-                        else return axd > bxd ? 1 : -1;
-
-                    case Priority.XBig:
-                        if (axd == bxd)
-                        {
-                            if (ayd == byd) return 0;
-                            else return ayd > byd ? 1 : -1;
-                        }
-                        else return axd < bxd ? 1 : -1;
-
-                    case Priority.YSmall:
-                        if (ayd == byd)
-                        {
-                            if (axd == bxd) return 0;
-                            else return axd > bxd ? 1 : -1;
-                        }
-                        else return ayd > byd ? 1 : -1;
-                    case Priority.YBig:
-                        if (ayd == byd)
-                        {
-                            if (axd == bxd) return 0;
-                            else return axd > bxd ? 1 : -1;
-                        }
-                        else return ayd < byd ? 1 : -1;
-                }
-                return 0;
-            }
-        }
         
-        public TSP_YJ(IList<List<Node>> startCond, TSPSet nodes)
+        
+        public GA_YJ(SortedDictionary<float, List<Node>> startCond, TSPSet nodes)
         {
-            thisGeneration = new SortedDictionary<float, List<Node>>();
-            foreach (var a in startCond)
-            {
-                try
-                { thisGeneration.Add(TSP.Evaluate(a, nodes).score, a); }
-                catch (ArgumentException) { }
-            }
+            thisGeneration = new SortedDictionary<float, List<Node>>(startCond);
             Console.WriteLine();
             this.nodes = nodes;
         }
 
         public object killLock = new object();
-
+        int generation = 0;
         public List<Node> CreateChild()
         {
             int momindex = DistRng(thisGeneration.Count - 1), dadindex = 0;
@@ -208,14 +144,15 @@ namespace TSP
                 ii += 1;
             }
             var hc = new HillClimbing(child, nodes);
-            for (int i = 0; i < 5; i++) hc.Iteration();
+            for (int i = 0; i < 50; i++) hc.Iteration();
             return hc.Iteration();
 
         }
         public void Iteration()
         {
+            generation++;
             var newGen = new SortedDictionary<float, List<Node>>();
-            for (int i = 0; i < 16; i++)
+            for (int i = 0; i < 4; i++)
             {
                 try
                 {
@@ -232,7 +169,7 @@ namespace TSP
             lock(killLock)
                 thisGeneration = newGen;
 
-            while (thisGeneration.Count > 32)//pool max
+            while (thisGeneration.Count > 8)//pool max
             {
                 var rndnum = thisGeneration.Count - 1 - DistRng(thisGeneration.Count - 2);
                 thisGeneration.Remove(thisGeneration.ElementAt(
@@ -241,13 +178,14 @@ namespace TSP
                 //Console.Write("kill: {0} ", rndnum);
             }
             int prntcnt = 0;
+            Console.Write("Gen: {0} - ", generation);
             foreach (var a in thisGeneration)
             {
-                if (prntcnt++ > 20) break;
-              //  Console.Write("{0} ", a.Key);
+                if (prntcnt++ > 10) break;
+                   Console.Write("{0} ", a.Key);
             }
 
-            //Console.WriteLine();
+            Console.WriteLine();
         }
         //random 0~range, 0 has higher chance
         int DistRng(int range)
